@@ -13,6 +13,8 @@ ANDROID_SDK_BUILD_TOOL_DIR = \
 ANDROID_SDK_PLATFORM_DIR = \
 	$(ANDROID_HOME)/platforms/$(CFG_ANDROID_SDK_PLATFORM)
 AAPT = $(ANDROID_SDK_BUILD_TOOL_DIR)/aapt
+ZIPALIGN = $(ANDROID_SDK_BUILD_TOOL_DIR)/zipalign
+APKSIGNER = $(ANDROID_SDK_BUILD_TOOL_DIR)/apksigner
 ANDROID_JAR = $(ANDROID_SDK_PLATFORM_DIR)/android.jar
 JACK_JAR = $(ANDROID_SDK_BUILD_TOOL_DIR)/jack.jar
 
@@ -44,14 +46,14 @@ create-dir:
 
 $(FINAL_APK): $(UNSIGNED_APK)
 	@$(call ECHO, "[build final apk ...]")
-	@apksigner sign --ks $(KEY_DIR)/android.keystore \
+	@$(APKSIGNER) sign --ks $(KEY_DIR)/android.keystore \
 		--ks-pass file:$(KEY_DIR)/keystore.password \
 		--key-pass file:$(KEY_DIR)/key.password \
 		--out $(FINAL_APK) $(UNSIGNED_APK)
 
 $(UNSIGNED_APK): $(UNALIGNED_APK)
 	@$(call ECHO, "[build unsigned apk ...]")
-	@zipalign -v -f -p 4 $(UNALIGNED_APK) $(UNSIGNED_APK)
+	@$(ZIPALIGN) -v -f -p 4 $(UNALIGNED_APK) $(UNSIGNED_APK)
 
 $(UNALIGNED_APK): AndroidManifest.xml $(CLASSES_DEX) $(CFG_RESOURCES)
 	@$(call ECHO, "[build unaligned apk ...]")
