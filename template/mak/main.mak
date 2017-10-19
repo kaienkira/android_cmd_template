@@ -97,7 +97,7 @@ $(CLASSES_DEX): $(CLASSES)
 $(CLASSES): $(SOURCES) $(R_JAVA) $(LIBRARIES)
 	@$(call ECHO, "[compile java classes...]")
 	@javac -bootclasspath $(ANDROID_JAR) \
-		$(foreach LIB,$(LIBRARIES),-cp $(LIB)) \
+		$(foreach LIB,$(LIBRARIES),-classpath $(LIB)) \
 		-d $(BUILD_BIN_CLASSES_DIR) \
 		$(SOURCES) $(R_JAVA)
 
