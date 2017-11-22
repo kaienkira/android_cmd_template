@@ -10,9 +10,9 @@ endef
 #==============================================================================
 # define tools
 ANDROID_SDK_BUILD_TOOL_DIR = \
-	$(ANDROID_HOME)/build-tools/$(CFG_ANDROID_SDK_BUILD_TOOL)
+	$(ANDROID_SDK_HOME)/build-tools/$(CFG_ANDROID_SDK_BUILD_TOOL)
 ANDROID_SDK_PLATFORM_DIR = \
-	$(ANDROID_HOME)/platforms/$(CFG_ANDROID_SDK_PLATFORM)
+	$(ANDROID_SDK_HOME)/platforms/$(CFG_ANDROID_SDK_PLATFORM)
 AAPT = $(ANDROID_SDK_BUILD_TOOL_DIR)/aapt
 DX = $(ANDROID_SDK_BUILD_TOOL_DIR)/dx
 ZIPALIGN = $(ANDROID_SDK_BUILD_TOOL_DIR)/zipalign
@@ -51,10 +51,10 @@ CLASSES = \
 			$(SRC_DIR)%.java, \
 			$(BUILD_BIN_CLASSES_DIR)%.class, \
 			$(SRC)))
-CLASSES_DEX=$(BUILD_BIN_DIR)/classes.dex
-UNALIGNED_APK=$(BUILD_BIN_DIR)/$(CFG_APK_NAME)-unaligned.apk
-UNSIGNED_APK=$(BUILD_BIN_DIR)/$(CFG_APK_NAME)-unsigned.apk
-FINAL_APK=$(BUILD_BIN_DIR)/$(CFG_APK_NAME).apk
+CLASSES_DEX = $(BUILD_BIN_DIR)/classes.dex
+UNALIGNED_APK = $(BUILD_BIN_DIR)/$(CFG_APK_NAME)-unaligned.apk
+UNSIGNED_APK = $(BUILD_BIN_DIR)/$(CFG_APK_NAME)-unsigned.apk
+FINAL_APK = $(BUILD_BIN_DIR)/$(CFG_APK_NAME).apk
 
 # define rules
 .PHONY: build check-config create-dir clean
@@ -62,8 +62,8 @@ FINAL_APK=$(BUILD_BIN_DIR)/$(CFG_APK_NAME).apk
 build: check-config create-dir $(FINAL_APK)
 
 check-config:
-ifndef ANDROID_HOME
-	$(error ANDROID_HOME is undefined)
+ifndef ANDROID_SDK_HOME
+	$(error ANDROID_SDK_HOME is undefined)
 endif
 
 create-dir:
