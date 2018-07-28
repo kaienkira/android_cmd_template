@@ -31,6 +31,7 @@ BUILD_GEN_DIR = build/gen
 BUILD_GEN_SRC_DIR = $(BUILD_DIR)/gen/$(subst .,/,$(CFG_PACKAGE_NAME))
 
 # define files
+ANDROID_MANIFEST_XML = AndroidManifest.xml
 R_JAVA = $(BUILD_GEN_SRC_DIR)/R.java
 SOURCES = \
 	$(shell \
@@ -74,7 +75,10 @@ create-dir:
 
 $(FINAL_APK): $(UNSIGNED_APK)
 	@$(call ECHO, "[build final apk ...]")
-	@$(APKSIGNER) sign --ks $(KEY_DIR)/android.keystore \
+	@$(APKSIGNER) sign \
+		--v1-signing-enabled true \
+		--v2-signing-enabled true \
+		--ks $(KEY_DIR)/android.keystore \
 		--ks-pass file:$(KEY_DIR)/keystore.password \
 		--key-pass file:$(KEY_DIR)/key.password \
 		--out $(FINAL_APK) $(UNSIGNED_APK)
@@ -83,12 +87,12 @@ $(UNSIGNED_APK): $(UNALIGNED_APK)
 	@$(call ECHO, "[build unsigned apk ...]")
 	@$(ZIPALIGN) -v -f -p 4 $(UNALIGNED_APK) $(UNSIGNED_APK)
 
-$(UNALIGNED_APK): AndroidManifest.xml $(CLASSES_DEX) $(RESOURCES)
+$(UNALIGNED_APK): $(ANDROID_MANIFEST_XML) $(CLASSES_DEX) $(RESOURCES)
 	@$(call ECHO, "[build unaligned apk ...]")
-	@$(AAPT) package -M AndroidManifest.xml \
+	@$(AAPT) package -M $(ANDROID_MANIFEST_XML) \
 		-I $(ANDROID_JAR) -S $(RES_DIR) \
 		-F $(UNALIGNED_APK) -f
-	@cd $(BUILD_BIN_DIR) && $(AAPT) add $(abspath $(UNALIGNED_APK)) classes.dex
+	@cd $(BUILD_BIN_DIR) && zip $(abspath $(UNALIGNED_APK)) classes.dex
 
 $(CLASSES_DEX): $(CLASSES)
 	@$(call ECHO, "[build classes.dex ...]")
@@ -101,9 +105,9 @@ $(CLASSES): $(SOURCES) $(R_JAVA) $(LIBRARIES)
 		-d $(BUILD_BIN_CLASSES_DIR) \
 		$(SOURCES) $(R_JAVA)
 
-$(R_JAVA): AndroidManifest.xml $(RESOURCES)
+$(R_JAVA): $(ANDROID_MANIFEST_XML) $(RESOURCES)
 	@$(call ECHO, "[generate R.java ...]")
-	@$(AAPT) package -M AndroidManifest.xml \
+	@$(AAPT) package -M $(ANDROID_MANIFEST_XML) \
 		-I $(ANDROID_JAR) -S $(RES_DIR) \
 		-J $(BUILD_GEN_DIR) -m
 
@@ -111,3 +115,4 @@ clean:
 	@$(call ECHO, "[clean build dir ...]")
 	@rm -rf $(BUILD_GEN_DIR)
 	@rm -rf $(BUILD_BIN_DIR)
+	@rm -f $(BUILD_DIR)/*.apk
