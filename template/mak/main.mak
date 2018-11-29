@@ -41,7 +41,6 @@ LIBRARIES = \
 		test -d $(LIB_DIR) && \
 		find $(LIB_DIR) -not -path '*/\.*' \
 			-type f -name '*.jar')
-LIBRARIES += $(CFG_ANDROID_SUPPORT_LIBS)
 
 RESOURCES = \
 	$(shell \
