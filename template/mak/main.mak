@@ -31,27 +31,32 @@ BUILD_GEN_DIR = build/gen
 BUILD_GEN_SRC_DIR = $(BUILD_DIR)/gen/$(subst .,/,$(CFG_PACKAGE_NAME))
 
 # define files
-ANDROID_MANIFEST_XML = AndroidManifest.xml
-R_JAVA = $(BUILD_GEN_SRC_DIR)/R.java
 SOURCES = \
 	$(shell \
 		find $(SRC_DIR) -not -path '*/\.*' \
 			-type f -name '*.java')
+
 LIBRARIES = \
 	$(shell \
 		test -d $(LIB_DIR) && \
 		find $(LIB_DIR) -not -path '*/\.*' \
 			-type f -name '*.jar')
+LIBRARIES += $(CFG_ANDROID_SUPPORT_LIBS)
+
 RESOURCES = \
 	$(shell \
 		find $(RES_DIR) -not -path '*/\.*' \
 			-type f)
+
 CLASSES = \
 	$(foreach SRC, $(SOURCES), \
 		$(patsubst \
 			$(SRC_DIR)%.java, \
 			$(BUILD_BIN_CLASSES_DIR)%.class, \
 			$(SRC)))
+
+ANDROID_MANIFEST_XML = AndroidManifest.xml
+R_JAVA = $(BUILD_GEN_SRC_DIR)/R.java
 CLASSES_DEX = $(BUILD_BIN_DIR)/classes.dex
 UNALIGNED_APK = $(BUILD_BIN_DIR)/$(CFG_APK_NAME)-unaligned.apk
 UNSIGNED_APK = $(BUILD_BIN_DIR)/$(CFG_APK_NAME)-unsigned.apk
@@ -101,7 +106,8 @@ $(CLASSES_DEX): $(CLASSES)
 $(CLASSES): $(SOURCES) $(R_JAVA) $(LIBRARIES)
 	@$(call ECHO, "[compile java classes...]")
 	@javac -bootclasspath $(ANDROID_JAR) \
-		$(foreach LIB,$(LIBRARIES),-classpath $(LIB)) \
+		$(if $(strip $(LIBRARIES)),-classpath) \
+		$(shell echo $(LIBRARIES) | sed 's/ \+/:/g') \
 		-d $(BUILD_BIN_CLASSES_DIR) \
 		$(SOURCES) $(R_JAVA)
 
